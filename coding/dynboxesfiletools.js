@@ -2,8 +2,8 @@
 const items = [
     {
         title: "Image Resizer",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/unknown.png",
-        url: "https://frostcat224.github.io/frostcatgameswebsite/filetools/imageresizer/",
+        image: "/img/unknown.png",
+        url: "/filetools/imageresizer/",
         size: "square"
     },
 ];
