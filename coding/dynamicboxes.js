@@ -8,8 +8,14 @@ const items = [
     },
     {
         title: "Find the Breadsellers",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/breadseller.png",
+        image: "/img/breadseller.png",
         url: "/ftbs",
+        size: "square"
+    },
+    {
+        title: "Guestbook",
+        image: "/img/unknown.png",
+        url: "https://frostcat224.atabook.org/",
         size: "square"
     },
     {
