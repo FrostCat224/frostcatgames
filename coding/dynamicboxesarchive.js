@@ -2,14 +2,14 @@
 const items = [
     {
         title: "kiki pijl en boog appel schieter",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/unknown.png",
-        url: "https://frostcat224.github.io/frostcatgameswebsite/archive/kikipijlenboogappelschieter.html",
+        image: "/img/unknown.png",
+        url: "/archive/kikipijlenboogappelschieter.html",
         size: "square"
     },
     {
         title: "Elemental Infinity Tree",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/unknown.png",
-        url: "https://frostcat224.github.io/frostcatgameswebsite/archive/elementalinf.html",
+        image: "/img/unknown.png",
+        url: "/elementalinf.html",
         size: "square"
     }
 ];
