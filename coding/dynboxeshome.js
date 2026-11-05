@@ -2,26 +2,26 @@
 const items = [
     {
         title: "Moechat",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/moechat.png",
-        url: "https://frostcat224.github.io/moechat",
+        image: "/img/moechat.png",
+        url: "https://moechat.pages.dev/",
         size: "square"
     },
     {
         title: "Find the Breadsellers",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/breadseller.png",
-        url: "https://frostcat224.github.io/frostcatgameswebsite/ftbs",
+        image: "/img/breadseller.png",
+        url: "/ftbs",
         size: "square"
     },
     {
         title: "Vote for Everything",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/vote.png",
-        url: "https://frostcat224.github.io/frostcatgameswebsite/voteforeverything/",
+        image: "/img/vote.png",
+        url: "/voteforeverything/",
         size: "square"
     },
     {
         title: "Elemental Quadrillion",
-        image: "https://frostcat224.github.io/frostcatgameswebsite/img/elementalquadrillion.png",
-        url: "https://frostcat224.github.io/frostcatgameswebsite/elementalquadrillion/",
+        image: "/img/elementalquadrillion.png",
+        url: "/elementalquadrillion/",
         size: "square"
     }
 ];
