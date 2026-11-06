@@ -2,50 +2,44 @@
 const items = [
     {
         title: "Moechat",
-        image: "/img/moechat.png",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/moechat.png",
         url: "https://moechat.pages.dev/",
         size: "wide"
     },
     {
         title: "Find the Breadsellers",
-        image: "/img/breadseller.png",
-        url: "/ftbs",
-        size: "square"
-    },
-    {
-        title: "Guestbook",
-        image: "/img/unknown.png",
-        url: "https://frostcat224.atabook.org/",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/breadseller.png",
+        url: "https://frostcat224.github.io/frostcatgameswebsite/ftbs",
         size: "square"
     },
     {
         title: "Vote for Everything",
-        image: "/img/vote.png",
-        url: "/voteforeverything/",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/vote.png",
+        url: "https://frostcat224.github.io/frostcatgameswebsite/voteforeverything/",
         size: "square"
     },
     {
         title: "Zoek de Bo's",
-        image: "/img/zoekdebos.png",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/zoekdebos.png",
         url: "https://turbowarp.org/886364357",
         size: "square"
     },
     {
         title: "Illegal Minecraft World",
-        image: "/img/netherportalblock.png",
-        url: "/minecraft/illegalworld.html",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/netherportalblock.png",
+        url: "https://frostcat224.github.io/frostcatgameswebsite/minecraft/illegalworld.html",
         size: "square"
     },
     {
         title: "File Tools",
-        image: "/img/unknown.png",
-        url: "/filetools/",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/unknown.png",
+        url: "https://frostcat224.github.io/frostcatgameswebsite/filetools/",
         size: "square"
     },
     {
         title: "Elemental Quadrillion",
-        image: "/img/elementalquadrillion.png",
-        url: "/elementalquadrillion/",
+        image: "https://frostcat224.github.io/frostcatgameswebsite/img/elementalquadrillion.png",
+        url: "https://frostcat224.github.io/frostcatgameswebsite/elementalquadrillion/",
         size: "square"
     }
 ];
