@@ -7,7 +7,9 @@ body {
     color: black;
     font-family: Verdana;
 }
-
+main {
+    padding: 20px;
+}
 header {
     background: rgba(0, 0, 0, 0.85);
     border-bottom: 4px solid #2e2e2e;
