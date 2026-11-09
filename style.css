@@ -207,17 +207,13 @@ main {
     color: white;
     text-decoration: none;
     padding: 16px 35px;
-    border-radius: 8px;
     font-size: 18px;
     font-weight: bold;
     box-shadow: 0 5px 20px rgba(0, 100, 255, 0.4);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.hero-button:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 120, 255, 0.7);
-}
+
 
 @media (max-width: 700px) {
     .hero {
