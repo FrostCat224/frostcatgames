@@ -209,7 +209,6 @@ main {
     padding: 16px 35px;
     font-size: 18px;
     font-weight: bold;
-    box-shadow: 0 5px 20px rgba(0, 100, 255, 0.4);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
