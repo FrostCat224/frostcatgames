@@ -160,7 +160,7 @@ main {
 /* HERO BANNER */
 
 .hero {
-    min-height: 480px;
+    min-height: 400px;
     background:
         linear-gradient(
             90deg,
@@ -209,9 +209,13 @@ main {
     padding: 16px 35px;
     font-size: 18px;
     font-weight: bold;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.hero {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+}
 
 
 @media (max-width: 700px) {
