@@ -1,4 +1,96 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicode Characters</title>
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+
+    <style>
+        #unicodeSearch {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-family: Verdana;
+        }
+
+        #unicodeGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .unicode-character {
+            background: white;
+            padding: 12px 5px;
+            text-align: center;
+            cursor: pointer;
+            color: black;
+        }
+
+        .unicode-symbol {
+            font-size: 30px;
+            min-height: 38px;
+        }
+
+        .unicode-code {
+            font-size: 10px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        #pagination {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #pagination button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="/img/textlogo.png" alt="FrostCatGames">
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/stuff">Stuff</a>
+            <a href="/archive">Archive</a>
+            <a href="/info">Info</a>
+            <a href="/search">Search</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>All Unicode Characters</h1>
+        <p>Click a character to copy it.</p>
+
+        <input
+            type="text"
+            id="unicodeSearch"
+            placeholder="Search code point (e.g. U+0041) or character..."
+        >
+
+        <p id="counter">Loading...</p>
+
+        <div id="unicodeGrid"></div>
+
+        <div id="pagination">
+            <button id="previous">Previous</button>
+            <span id="pageInfo"></span>
+            <button id="next">Next</button>
+        </div>
+    </main>
+
+    
 <script>
     const PAGE_SIZE = 500;
     const UNICODE_DATA_URL =
@@ -159,3 +251,6 @@
 
     loadCharacters();
 </script>
+
+</body>
+</html>
