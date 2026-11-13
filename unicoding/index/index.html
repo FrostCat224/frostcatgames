@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicode Characters - FrostCatGames</title>
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+
+    <style>
+        #unicodeSearch {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-family: Verdana;
+        }
+
+        #unicodeGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .unicode-character {
+            background: white;
+            padding: 12px 5px;
+            text-align: center;
+            cursor: pointer;
+            color: black;
+        }
+
+        .unicode-symbol {
+            font-size: 30px;
+            min-height: 38px;
+        }
+
+        .unicode-code {
+            font-size: 10px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        #pagination {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #pagination button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="/img/textlogo.png" alt="FrostCatGames">
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/stuff">Stuff</a>
+            <a href="/archive">Archive</a>
+            <a href="/info">Info</a>
+            <a href="/search">Search</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Unicode Index</h1>
+        <p>Click a character to copy it</p>
+
+        <input
+            type="text"
+            id="unicodeSearch"
+            placeholder="Search code point (e.g. U+0041) or character..."
+        >
+
+        <p id="counter">Loading...</p>
+
+        <div id="unicodeGrid"></div>
+
+        <div id="pagination">
+            <button id="previous">Previous</button>
+            <span id="pageInfo"></span>
+            <button id="next">Next</button>
+        </div>
+    </main>
+
+    <script>
+        const PAGE_SIZE = 500;
+        const MAX_UNICODE = 0x10FFFF;
+
+        let characters = [];
+        let filteredCharacters = [];
+        let currentPage = 0;
+
+        for (let i = 0; i <= MAX_UNICODE; i++) {
+
+            if (i >= 0xD800 && i <= 0xDFFF) continue;
+
+            characters.push(i);
+        }
+
+        filteredCharacters = characters;
+
+        const grid = document.getElementById("unicodeGrid");
+        const counter = document.getElementById("counter");
+        const pageInfo = document.getElementById("pageInfo");
+
+        function render() {
+            grid.innerHTML = "";
+
+            const start = currentPage * PAGE_SIZE;
+            const end = Math.min(
+                start + PAGE_SIZE,
+                filteredCharacters.length
+            );
+
+            const fragment = document.createDocumentFragment();
+
+            for (let i = start; i < end; i++) {
+                const code = filteredCharacters[i];
+                const character = String.fromCodePoint(code);
+
+                const item = document.createElement("div");
+                item.className = "unicode-character";
+                item.title = "Click to copy " + character;
+
+                const symbol = document.createElement("div");
+                symbol.className = "unicode-symbol";
+                symbol.textContent = character;
+
+                const codeLabel = document.createElement("div");
+                codeLabel.className = "unicode-code";
+                codeLabel.textContent =
+                    "U+" + code.toString(16).toUpperCase().padStart(4, "0");
+
+                item.appendChild(symbol);
+                item.appendChild(codeLabel);
+
+                item.addEventListener("click", async () => {
+                    try {
+                        await navigator.clipboard.writeText(character);
+                        counter.textContent =
+                            "Copied " + character + "!";
+                    } catch (error) {
+                        counter.textContent =
+                            "Could not copy character.";
+                    }
+                });
+
+                fragment.appendChild(item);
+            }
+
+            grid.appendChild(fragment);
+
+            const totalPages = Math.ceil(
+                filteredCharacters.length / PAGE_SIZE
+            );
+
+            counter.textContent =
+                filteredCharacters.length.toLocaleString() +
+                " characters found";
+
+            pageInfo.textContent =
+                "Page " + (currentPage + 1) +
+                " of " + totalPages;
+
+            document.getElementById("previous").disabled =
+                currentPage === 0;
+
+            document.getElementById("next").disabled =
+                currentPage >= totalPages - 1;
+        }
+
+        document.getElementById("previous").onclick = () => {
+            if (currentPage > 0) {
+                currentPage--;
+                render();
+            }
+        };
+
+        document.getElementById("next").onclick = () => {
+            if ((currentPage + 1) * PAGE_SIZE < filteredCharacters.length) {
+                currentPage++;
+                render();
+            }
+        };
+
+        document.getElementById("unicodeSearch").addEventListener(
+            "input",
+            event => {
+                const query = event.target.value.trim().toLowerCase();
+
+                if (!query) {
+                    filteredCharacters = characters;
+                } else if (/^u\+[0-9a-f]+$/i.test(query)) {
+                    const code = parseInt(query.slice(2), 16);
+
+                    filteredCharacters = characters.filter(
+                        c => c === code
+                    );
+                } else {
+                    filteredCharacters = characters.filter(code => {
+                        const character = String.fromCodePoint(code);
+                        return character === query;
+                    });
+                }
+
+                currentPage = 0;
+                render();
+            }
+        );
+
+        render();
+    </script>
+</body>
+</html>
