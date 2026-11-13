@@ -1,59 +1,59 @@
 [
   {
     "name": "Home",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/"
+    "link": "/"
   },
   {
     "name": "Stuff",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/stuff/"
+    "link": "/stuff/"
   },
   {
     "name": "Archive",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/archive/"
+    "link": "/archive/"
   },
   {
     "name": "Find the Breadsellers",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/ftbs/"
+    "link": "/ftbs/"
   },
   {
     "name": "Moechat",
-    "link": "https://frostcat224.github.io/moechat"
+    "link": "https://moechat.pages.dev/"
   },
   {
     "name": "List of Breadsellers in Find the Breadsellers",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/ftbs/list.txt"
+    "link": "/ftbs/list.txt"
   },
   {
     "name": "Moechat (Top)",
-    "link": "https://frostcat224.github.io/moechat/top/"
+    "link": "https://moechat.pages.dev/top/"
   },
   {
     "name": "Moechat (Bottom)",
-    "link": "https://frostcat224.github.io/moechat/bottom/"
-  },
-  {
-    "name": "Moechat (Trending)",
-    "link": "https://frostcat224.github.io/moechat/trending/"
-  },
-  {
-    "name": "Moechat (Recent)",
-    "link": "https://frostcat224.github.io/moechat/recent/"
+    "link": "https://moechat.pages.dev/bottom/"
   },
   {
     "name": "Moechat (News)",
-    "link": "https://frostcat224.github.io/moechat/news/"
+    "link": "https://moechat.pages.dev/news/"
+  },
+  {
+    "name": "Moechat (Minecraft)",
+    "link": "https://moechat.pages.dev/minecraft/"
+  },
+  {
+    "name": "Moechat (Cats)",
+    "link": "https://moechat.pages.dev/cats/"
   },
   {
     "name": "i hate roblox (Moechat)",
-    "link": "https://frostcat224.github.io/moechat/post/?id=-OvKsEBXMFWl6dGkv3Yg"
+    "link": "https://moechat.pages.dev/post/?id=-OvKsEBXMFWl6dGkv3Yg"
   },
   {
     "name": "hi (Moechat)",
-    "link": "https://frostcat224.github.io/moechat/post/?id=-OveMgww-oaRX6BHfK5g"
+    "link": "https://moechat.pages.dev/post/?id=-OveMgww-oaRX6BHfK5g"
   },
   {
     "name": "moechat is da best (Moechat)",
-    "link": "https://frostcat224.github.io/moechat/post/?id=-OvKsvbiwseTfDnpl201"
+    "link": "https://moechat.pages.dev/post/?id=-OvKsvbiwseTfDnpl201"
   },
   {
     "name": "Zoek de Bo's",
@@ -61,62 +61,58 @@
   },
   {
     "name": "Search",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/search/"
+    "link": "/search/"
   },
   {
     "name": "Illegal Minecraft World",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/minecraft/illegalworld.html"
+    "link": "/minecraft/illegalworld.html"
   },
   {
     "name": "kiki pijl en boog appel schieter",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/archive/kikipijlenboogappelschieter.html"
+    "link": "/archive/kikipijlenboogappelschieter.html"
   },
   {
     "name": "Vote for Everything",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/voteforeverything/"
+    "link": "/voteforeverything/"
   },
   {
     "name": "Vote for Everything Results",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/voteforeverything/results/"
+    "link": "/voteforeverything/results/"
   },
   {
     "name": "File Tools",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/filetools/"
+    "link": "/filetools/"
   },
   {
     "name": "Image Resizer",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/filetools/imageresizer/"
+    "link": "/filetools/imageresizer/"
   },
   {
     "name": "Multideletable Words",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/a/multideletablewords.html"
+    "link": "/a/multideletablewords.html"
   },
   {
     "name": "Elemental Quadrillion",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/elementalquadrillion/"
+    "link": "/elementalquadrillion/"
   },
   {
     "name": "Elemental Quadrillion Stats",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/elementalquadrillion/stats/"
+    "link": "/elementalquadrillion/stats/"
   },
   {
     "name": "Pi",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/a/pi.txt"
+    "link": "/a/pi.txt"
   },
   {
     "name": "Elemental Quadrillion Credits",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/elementalquadrillion/credits/"
+    "link": "/elementalquadrillion/credits/"
   },
   {
     "name": "A",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/a/"
+    "link": "/a/"
   },
   {
     "name": "Rommelkoe",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/a/rommelkoe.html"
-  },
-  {
-    "name": "GDPlace",
-    "link": "https://frostcat224.github.io/frostcatgameswebsite/gdplace/"
+    "link": "/a/rommelkoe.html"
   }
 ]
