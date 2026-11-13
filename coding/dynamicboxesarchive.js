@@ -9,7 +9,7 @@ const items = [
     {
         title: "Elemental Infinity Tree",
         image: "/img/unknown.png",
-        url: "/elementalinf.html",
+        url: "/archive/elementalinf.html",
         size: "square"
     }
 ];
