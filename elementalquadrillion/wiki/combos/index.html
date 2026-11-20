@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elemental Quadrillion</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f2f2f2;
+}
+
+header{
+    background:#222;
+    color:white;
+    padding:10px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+input, select, button{
+    padding:8px;
+    font-size:14px;
+}
+
+#wrap{
+    padding:12px;
+}
+
+.card{
+    background:white;
+    border-left:8px solid #999;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:8px;
+}
+
+.title{
+    font-weight:bold;
+    font-size:16px;
+}
+
+.recipe{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+.element{
+    padding:8px;
+    border-radius:8px;
+    color:white;
+    font-weight:bold;
+}
+
+.small{
+    font-size:13px;
+    color:#555;
+    margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <b>Elemental Quadrillion Combinations</b>
+
+    <input id="search" placeholder="Search name or ID">
+
+    <select id="sort">
+        <option value="id">Sort by Result ID</option>
+        <option value="name">Sort by Result Name</option>
+    </select>
+
+    <button id="prev">Prev</button>
+    <button id="next">Next</button>
+
+    <span id="pageInfo"></span>
+</header>
+
+<div style="padding:10px;">
+    <button onclick="location.href='/elementalquadrillion/wiki/'">
+        Elements
+    </button>
+    
+</div>
+
+<div id="wrap"></div>
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    onValue
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+
+const firebaseConfig = {
+    apiKey:"AIzaSyDFH5CJJR-dNrBcA8h8zfks-9mCxo-vxt0",
+    authDomain:"elementalquadrillion.firebaseapp.com",
+    databaseURL:"https://elementalquadrillion-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"elementalquadrillion",
+    storageBucket:"elementalquadrillion.firebasestorage.app",
+    messagingSenderId:"828897871116",
+    appId:"1:828897871116:web:8e05949030ca774ce5f529"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+
+let elements = {
+    1:{id:1,name:"Air",color:"#dddddd"},
+    2:{id:2,name:"Earth",color:"#a3501c"},
+    3:{id:3,name:"Fire",color:"#ff6b39"},
+    4:{id:4,name:"Water",color:"#3f88ff"}
+};
+
+let combinations = [];
+
+let page = 0;
+const perPage = 100;
+
+const wrap = document.getElementById("wrap");
+const search = document.getElementById("search");
+const sort = document.getElementById("sort");
+
+
+function getElement(id){
+
+    return elements[id] || {
+        id:id,
+        name:"Unknown",
+        color:"#999999"
+    };
+
+}
+
+
+function rebuild(){
+
+    const q = search.value.toLowerCase().trim();
+
+    let list = combinations.filter(combo=>{
+
+        const a = getElement(combo.a);
+        const b = getElement(combo.b);
+        const result = getElement(combo.result);
+
+        const text = [
+            a.name, a.id,
+            b.name, b.id,
+            result.name, result.id
+        ].join(" ").toLowerCase();
+
+        return text.includes(q);
+
+    });
+
+
+    if(sort.value === "name"){
+
+        list.sort((a,b)=>
+            getElement(a.result).name.localeCompare(
+                getElement(b.result).name
+            )
+        );
+
+    }else{
+
+        list.sort((a,b)=>a.result-b.result);
+
+    }
+
+    return list;
+
+}
+
+
+function getMaxPage(list){
+
+    return Math.max(
+        0,
+        Math.ceil(list.length/perPage)-1
+    );
+
+}
+
+
+function createElementBox(element){
+
+    const div = document.createElement("div");
+
+    div.className = "element";
+    div.style.background = element.color || "#999";
+
+    div.style.color = getTextColor(element.color || "#999");
+
+    div.textContent = element.name + " (#" + element.id + ")";
+
+    return div;
+
+}
+
+
+function getTextColor(hex){
+
+    const c = hex.replace("#","");
+
+    const r = parseInt(c.slice(0,2),16);
+    const g = parseInt(c.slice(2,4),16);
+    const b = parseInt(c.slice(4,6),16);
+
+    const brightness = (r*299 + g*587 + b*114)/1000;
+
+    return brightness > 140 ? "#000" : "#fff";
+
+}
+
+
+function render(){
+
+    const list = rebuild();
+
+    const maxPage = getMaxPage(list);
+
+    if(page > maxPage) page = maxPage;
+    if(page < 0) page = 0;
+
+    const items = list.slice(
+        page*perPage,
+        page*perPage+perPage
+    );
+
+    wrap.innerHTML = "";
+
+
+    items.forEach(combo=>{
+
+        const a = getElement(combo.a);
+        const b = getElement(combo.b);
+        const result = getElement(combo.result);
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+        card.style.borderLeftColor = result.color || "#999";
+
+
+        const title = document.createElement("div");
+
+        title.className = "title";
+        title.textContent = "Combination #" + combo.a + "_" + combo.b;
+
+        card.appendChild(title);
+
+
+        const recipe = document.createElement("div");
+
+        recipe.className = "recipe";
+
+        recipe.appendChild(createElementBox(a));
+
+        const plus = document.createElement("b");
+        plus.textContent = "+";
+        recipe.appendChild(plus);
+
+        recipe.appendChild(createElementBox(b));
+
+        const equals = document.createElement("b");
+        equals.textContent = "=";
+        recipe.appendChild(equals);
+
+        recipe.appendChild(createElementBox(result));
+
+        card.appendChild(recipe);
+
+
+        const info = document.createElement("div");
+
+        info.className = "small";
+        info.textContent = "Result ID: #" + result.id;
+
+        card.appendChild(info);
+
+        wrap.appendChild(card);
+
+    });
+
+
+    if(items.length === 0){
+
+        wrap.textContent = "No combinations found.";
+
+    }
+
+
+    document.getElementById("pageInfo").innerText =
+        `Combinations: ${list.length} | Page ${page+1} / ${maxPage+1}`;
+
+}
+
+
+// LOAD ELEMENTS
+
+onValue(ref(db,"elements"), snap=>{
+
+    elements = {
+        1:{id:1,name:"Air",color:"#dddddd"},
+        2:{id:2,name:"Earth",color:"#a3501c"},
+        3:{id:3,name:"Fire",color:"#ff6b39"},
+        4:{id:4,name:"Water",color:"#3f88ff"}
+    };
+
+    if(snap.exists()){
+
+        Object.assign(elements,snap.val());
+
+    }
+
+    render();
+
+});
+
+
+// LOAD ALL COMBINATIONS
+
+onValue(ref(db,"combinations"), snap=>{
+
+    combinations = [];
+
+    if(snap.exists()){
+
+        const data = snap.val();
+
+        Object.entries(data).forEach(([key,resultId])=>{
+
+            const ids = key.split("_").map(Number);
+
+            if(ids.length !== 2 || ids.some(id=>!Number.isFinite(id))){
+                return;
+            }
+
+            combinations.push({
+
+                a:ids[0],
+                b:ids[1],
+                result:Number(resultId)
+
+            });
+
+        });
+
+    }
+
+    render();
+
+});
+
+
+// CONTROLS
+
+search.oninput = ()=>{
+    page = 0;
+    render();
+};
+
+sort.onchange = ()=>{
+    page = 0;
+    render();
+};
+
+document.getElementById("prev").onclick = ()=>{
+
+    if(page > 0){
+        page--;
+        render();
+    }
+
+};
+
+document.getElementById("next").onclick = ()=>{
+
+    const maxPage = getMaxPage(rebuild());
+
+    if(page < maxPage){
+        page++;
+        render();
+    }
+
+};
+
+</script>
+
+</body>
+</html>
