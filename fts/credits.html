@@ -8,7 +8,13 @@
 </head>
 
 <body>
-  <a href="/fts/back.html/">Return to game</a>
+  <button onclick="sendMessage()">Return to Find the Sammies</button>
+
+<script>
+function sendMessage() {
+    window.parent.postMessage("back", "*");
+}
+</script>
   <h1>Game Credits</h1>
   <p>© 2026 FrostCatGames. Original content belongs to FrostCatGames. Third-party content belongs to its respective owners.</p>
   <h2>Creator</h2>
