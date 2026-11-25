@@ -131,12 +131,12 @@ function getDomain(id) {
 function renderSidebar() {
     const domain = getDomain(currentId);
     sidebarCurrent.innerHTML = domain
-        ? `<div class="side-link current" onclick="window.openDomain(${currentId})">#${currentId} — ${escapeHtml(domain.name || domain.url || "Unnamed")}</div>`
+        ? `<div class="side-link current" onclick="window.openDomain(${currentId})">#${currentId} - ${escapeHtml(domain.name || domain.url || "Unnamed")}</div>`
         : `<span class="muted">Domain not found</span>`;
     const links = domain?.links || [];
     sidebarLinks.innerHTML = links.map(id => {
         const target = getDomain(id);
-        return target ? `<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} — ${escapeHtml(target.name || target.url || "Unnamed")}</div>` : "";
+        return target ? `<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} - ${escapeHtml(target.name || target.url || "Unnamed")}</div>` : "";
     }).join("");
 }
 function renderPage() {
@@ -153,7 +153,7 @@ function renderPage() {
         const icon = target.favicon || safeFavicon(target.url);
         return `<div class="domain-card" onclick="window.openDomain(${Number(id)})">
             <img src="${escapeHtml(icon)}" data-domain="${escapeHtml(target.url)}" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(this.dataset.domain)+'&sz=64'" alt="">
-            <div><strong>#${id} — ${escapeHtml(target.name || "Unnamed")}</strong><small>${escapeHtml(target.url || "")}</small></div>
+            <div><strong>#${id} - ${escapeHtml(target.name || "Unnamed")}</strong><small>${escapeHtml(target.url || "")}</small></div>
         </div>`;
     }).join("");
     pageEl.innerHTML = `
@@ -165,31 +165,11 @@ function renderPage() {
             <h3>Website</h3>
             <div class="url"><a href="${escapeHtml(domain.url || "#")}" target="_blank" rel="noopener noreferrer">${escapeHtml(domain.url || "No URL set")}</a></div>
         </div>
-        <div class="panel"><h3>Description</h3><div>${escapeHtml(domain.description || "No description yet.")}</div></div>
-        <div class="panel"><h3>Additional information</h3><div style="white-space:pre-wrap">${escapeHtml(domain.info || "No additional information.")}</div></div>
+      
         <div class="panel"><h3>Links (${(domain.links || []).length})</h3>
             ${links ? `<div class="domain-list">${links}</div>` : `<p class="muted">No linked domains yet.</p>`}
         </div>
-        <div class="panel">
-            <h3>Add a domain</h3>
-            <form id="addDomainForm" class="form-grid">
-                <label>Name<input name="name" required placeholder="Website name"></label>
-                <label>URL<input name="url" type="url" required placeholder="https://example.com"></label>
-                <label>Description<textarea name="description" placeholder="What is this website?"></textarea></label>
-                <label>Additional information<textarea name="info" placeholder="Extra notes, facts, etc."></textarea></label>
-                <button type="submit">Create domain and link it here</button>
-            </form>
-        </div>
-        <div class="panel">
-            <h3>Edit this domain</h3>
-            <form id="editDomainForm" class="form-grid">
-                <label>Name<input name="name" required value="${escapeHtml(domain.name || "")}"></label>
-                <label>URL<input name="url" type="url" required value="${escapeHtml(domain.url || "")}"></label>
-                <label>Description<textarea name="description">${escapeHtml(domain.description || "")}</textarea></label>
-                <label>Additional information<textarea name="info">${escapeHtml(domain.info || "")}</textarea></label>
-                <button type="submit" class="secondary">Save changes</button>
-            </form>
-        </div>`;
+        `;
     const addForm = document.getElementById("addDomainForm");
     addForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -273,7 +253,7 @@ searchEl.addEventListener("input", () => {
         String(id).includes(query) || (d.name || "").toLowerCase().includes(query) || (d.url || "").toLowerCase().includes(query)
     ).slice(0, 30);
     sidebarCurrent.innerHTML = `<div class="sidebar-title">Search results</div>` + found.map(([id, d]) =>
-        `<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} — ${escapeHtml(d.name || d.url || "Unnamed")}</div>`
+        `<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} - ${escapeHtml(d.name || d.url || "Unnamed")}</div>`
     ).join("");
     sidebarLinks.innerHTML = "";
 });
