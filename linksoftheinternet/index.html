@@ -122,26 +122,33 @@ document.getElementById("homeButton").addEventListener("click",()=>openDomain(1)
 searchEl.addEventListener("input",()=>renderSearch(searchEl.value));
 
 async function loadIndex() {
-
-    const cached=readCache();
-    if(cached){index=cached;renderSearch(searchEl.value);return;}
-    const idxSnap=await get(ref(db,"domainIndex"));
-    if(idxSnap.exists()) {
-        index=idxSnap.val()||{}; updateCache(); renderSearch(searchEl.value); return;
+    const cached = readCache();
+    if (cached) {
+        index = cached;
+        renderSearch(searchEl.value);
+        return;
     }
 
-    statusEl.textContent="Building lightweight index (one-time setup)...";
-    const fullSnap=await get(ref(db,"domains"));
-    const full=fullSnap.val()||{}; const rebuilt={};
-    for(const [id,d] of Object.entries(full)) if(d) rebuilt[id]=makeIndexEntry({...d,id:Number(d.id||id)});
-    await set(ref(db,"domainIndex"),rebuilt);
-    index=rebuilt; updateCache(); renderSearch(searchEl.value);
-    statusEl.textContent=" ";
+    statusEl.textContent = "Loading domains...";
+
+    const fullSnap = await get(ref(db, "domains"));
+    const full = fullSnap.val() || {};
+    const rebuilt = {};
+
+    for (const [id, d] of Object.entries(full)) {
+        if (d) rebuilt[id] = makeIndexEntry({...d, id:Number(d.id||id)});
+    }
+
+    index = rebuilt;
+    updateCache();
+    renderSearch(searchEl.value);
+    statusEl.textContent = "";
 }
-async function saveIndexEntry(id,domain) {
-    const entry=makeIndexEntry({...domain,id:Number(id)});
-    await set(ref(db,"domainIndex/"+id),entry);
-    index[String(id)]=entry; updateCache(); renderSearch(searchEl.value);
+async function saveIndexEntry(id, domain) {
+    const entry = makeIndexEntry({...domain, id:Number(id)});
+    index[String(id)] = entry;
+    updateCache();
+    renderSearch(searchEl.value);
 }
 try {
     await signInAnonymously(auth);
