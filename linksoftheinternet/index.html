@@ -6,7 +6,7 @@
 <title>Links of the Internet</title>
 <style>
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Verdana, sans-serif; background: #f2f4f7; color: #222; }
+    body { margin: 0; background: #f2f4f7; color: #222; }
     header { background: #263c59; color: white; padding: 18px 24px; }
     header h1 { margin: 0; font-size: 23px; }
     header p { margin: 8px 0 0; font-size: 13px; color: #d7e2ef; }
@@ -20,13 +20,10 @@
     button:hover { background: #365579; }
     button.secondary { background: #e1e6ed; color: #222; border: 1px solid #bdc7d3; }
     button.secondary:hover { background: #d2dae4; }
-    button.danger { background: #b63c3c; }
-    button.danger:hover { background: #922d2d; }
     .search { margin-bottom: 15px; }
     .sidebar-title { font-size: 12px; color: #536579; text-transform: uppercase; font-weight: bold; margin: 20px 0 8px; }
     .side-link { display: block; padding: 8px 10px; border-radius: 5px; color: #263c59; cursor: pointer; word-break: break-word; }
     .side-link:hover { background: #d3dce7; }
-    .side-link.current { background: #c6d6e8; font-weight: bold; }
     .domain-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
     .favicon { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; background: white; border: 1px solid #ddd; padding: 5px; }
     .domain-header h2 { margin: 0 0 7px; font-size: 24px; word-break: break-word; }
@@ -42,45 +39,23 @@
     .domain-card small { color: #667788; margin-top: 4px; }
     .url { overflow-wrap: anywhere; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .form-grid { display: grid; gap: 12px; }
-    .form-grid label { display: grid; gap: 6px; font-size: 13px; font-weight: bold; }
-    .hidden { display: none !important; }
     #status { font-size: 13px; color: #536579; margin-top: 10px; }
-    .notice { background: #fff8e8; border: 1px solid #e9d5a3; border-radius: 6px; padding: 12px; font-size: 13px; margin-bottom: 15px; }
-    @media (max-width: 760px) {
-        .layout { display: block; }
-        aside { width: 100%; border-right: 0; border-bottom: 1px solid #cbd3dd; }
-        main { padding: 18px; }
-    }
+    @media (max-width: 760px) { .layout { display: block; } aside { width: 100%; border-right: 0; border-bottom: 1px solid #cbd3dd; } main { padding: 18px; } }
 </style>
 </head>
 <body>
-<header>
-    <h1>Links of the internet</h1>
-    <p>A wiki for exploring connected websites and domains</p>
-</header>
+<header><h1>Links of the internet</h1><p>A wiki for exploring connected websites and domains</p></header>
 <div class="layout">
     <aside>
         <input id="search" class="search" placeholder="Search domains..." autocomplete="off">
-        <div class="sidebar-title">Current domain</div>
-        <div id="currentSidebar">Loading...</div>
-        <div class="sidebar-title">Quick links</div>
-        <div id="sidebarLinks"></div>
-        <div class="actions">
-            <button class="secondary" id="homeButton">Go to Domain #1</button>
-        </div>
+        <div id="searchResults"></div>
+        <div class="actions"><button class="secondary" id="homeButton">Go to Domain #1</button></div>
     </aside>
-    <main>
-        <div id="page">
-            <p>Loading domain wiki...</p>
-        </div>
-        <div id="status"></div>
-    </main>
+    <main><div id="page"><p>Loading domain wiki...</p></div><div id="status"></div></main>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getDatabase, ref, get, set, update, push, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -92,182 +67,88 @@ const firebaseConfig = {
   messagingSenderId: "49526153880",
   appId: "1:49526153880:web:0f87bd72fee625990726ed"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-
 const pageEl = document.getElementById("page");
-const sidebarCurrent = document.getElementById("currentSidebar");
-const sidebarLinks = document.getElementById("sidebarLinks");
+const searchResultsEl = document.getElementById("searchResults");
 const statusEl = document.getElementById("status");
 const searchEl = document.getElementById("search");
-
-let domains = {};
+const CACHE_KEY = "domainWikiIndexCache_v1";
+const CACHE_TTL = 5 * 60 * 1000; 
+let index = {};
 let currentId = 1;
+let currentDomain = null;
 
-function safeFavicon(url) {
-    try {
-        const parsed = new URL(url);
-        return parsed.origin + "/favicon.ico";
-    } catch {
-        return "";
-    }
+function safeFavicon(url) { try { return new URL(url).origin + "/favicon.ico"; } catch { return ""; } }
+function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
+function normalizeUrl(url) { if (!/^https?:\/\//i.test(url)) url = "https://" + url; return url; }
+function getIndexed(id) { return index[String(id)] || null; }
+function updateCache() { try { localStorage.setItem(CACHE_KEY, JSON.stringify({savedAt:Date.now(), index})); } catch {} }
+function readCache() { try { const c=JSON.parse(localStorage.getItem(CACHE_KEY)||"null"); if(c && Date.now()-c.savedAt<CACHE_TTL && c.index) return c.index; } catch {} return null; }
+function makeIndexEntry(d) { return {id:d.id, name:d.name||"", url:d.url||"", favicon:d.favicon||safeFavicon(d.url||""), links:Array.isArray(d.links)?d.links:[]}; }
+function renderSearch(query="") {
+    query=query.toLowerCase().trim();
+    if(!query){searchResultsEl.innerHTML="";return;}
+    const found=Object.entries(index).filter(([id,d])=>String(id).includes(query)||(d.name||"").toLowerCase().includes(query)||(d.url||"").toLowerCase().includes(query)).slice(0,50);
+    searchResultsEl.innerHTML=`<div class="sidebar-title">Search results (${found.length}${found.length===50?"+":""})</div>`+found.map(([id,d])=>`<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} - ${escapeHtml(d.name||d.url||"Unnamed")}</div>`).join("");
 }
-function fallbackIcon(img) {
-    img.onerror = () => {
-        img.onerror = null;
-        img.src = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(img.dataset.domain || "") + "&sz=64";
-    };
-}
-function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, ch => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    }[ch]));
-}
-function getDomain(id) {
-    return domains[String(id)];
-}
-function renderSidebar() {
-    const domain = getDomain(currentId);
-    sidebarCurrent.innerHTML = domain
-        ? `<div class="side-link current" onclick="window.openDomain(${currentId})">#${currentId} - ${escapeHtml(domain.name || domain.url || "Unnamed")}</div>`
-        : `<span class="muted">Domain not found</span>`;
-    const links = domain?.links || [];
-    sidebarLinks.innerHTML = links.map(id => {
-        const target = getDomain(id);
-        return target ? `<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} - ${escapeHtml(target.name || target.url || "Unnamed")}</div>` : "";
+function renderPage(domain) {
+    currentDomain=domain;
+    if(!domain){pageEl.innerHTML=`<div class="panel"><h2>Domain #${currentId} not found</h2><p>This ID doesn't exist in the database.</p><button onclick="window.openDomain(1)">Return to Domain #1</button></div>`;return;}
+    const favicon=domain.favicon||safeFavicon(domain.url);
+    const linkedIds=Array.isArray(domain.links)?domain.links:[];
+    const links=linkedIds.map(id=>{
+        const target=getIndexed(id); if(!target)return `<div class="domain-card" onclick="window.openDomain(${Number(id)})"><div><strong>#${id}</strong><small>Loading/unknown in index</small></div></div>`;
+        const icon=target.favicon||safeFavicon(target.url);
+        return `<div class="domain-card" onclick="window.openDomain(${Number(id)})"><img src="${escapeHtml(icon)}" data-domain="${escapeHtml(target.url)}" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(this.dataset.domain)+'&sz=64'" alt=""><div><strong>#${id} - ${escapeHtml(target.name||"Unnamed")}</strong><small>${escapeHtml(target.url||"")}</small></div></div>`;
     }).join("");
+    pageEl.innerHTML=`<div class="domain-header"><img class="favicon" src="${escapeHtml(favicon)}" data-domain="${escapeHtml(domain.url||"")}" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(this.dataset.domain)+'&sz=64'" alt="Favicon"><div><h2>${escapeHtml(domain.name||"Unnamed domain")}</h2><div class="muted">Domain ID: #${currentId}</div></div></div><div class="panel"><h3>Website</h3><div class="url"><a href="${escapeHtml(domain.url||"#")}" target="_blank" rel="noopener noreferrer">${escapeHtml(domain.url||"No URL set")}</a></div></div><div class="panel"><h3>Links (${linkedIds.length})</h3>${linkedIds.length?`<div class="domain-list">${links}</div>`:`<p class="muted">No linked domains yet.</p>`}</div>`;
 }
-function renderPage() {
-    const domain = getDomain(currentId);
-    if (!domain) {
-        pageEl.innerHTML = `<div class="panel"><h2>Domain #${currentId} not found</h2><p>This ID doesn't exist in the database.</p><button onclick="window.openDomain(1)">Return to Domain #1</button></div>`;
-        renderSidebar();
-        return;
-    }
-    const favicon = domain.favicon || safeFavicon(domain.url);
-    const links = (domain.links || []).map(id => {
-        const target = getDomain(id);
-        if (!target) return "";
-        const icon = target.favicon || safeFavicon(target.url);
-        return `<div class="domain-card" onclick="window.openDomain(${Number(id)})">
-            <img src="${escapeHtml(icon)}" data-domain="${escapeHtml(target.url)}" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(this.dataset.domain)+'&sz=64'" alt="">
-            <div><strong>#${id} - ${escapeHtml(target.name || "Unnamed")}</strong><small>${escapeHtml(target.url || "")}</small></div>
-        </div>`;
-    }).join("");
-    pageEl.innerHTML = `
-        <div class="domain-header">
-            <img class="favicon" src="${escapeHtml(favicon)}" data-domain="${escapeHtml(domain.url || "")}" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(this.dataset.domain)+'&sz=64'" alt="Favicon">
-            <div><h2>${escapeHtml(domain.name || "Unnamed domain")}</h2><div class="muted">Domain ID: #${currentId}</div></div>
-        </div>
-        <div class="panel">
-            <h3>Website</h3>
-            <div class="url"><a href="${escapeHtml(domain.url || "#")}" target="_blank" rel="noopener noreferrer">${escapeHtml(domain.url || "No URL set")}</a></div>
-        </div>
-      
-        <div class="panel"><h3>Links (${(domain.links || []).length})</h3>
-            ${links ? `<div class="domain-list">${links}</div>` : `<p class="muted">No linked domains yet.</p>`}
-        </div>
-        `;
-    const addForm = document.getElementById("addDomainForm");
-    addForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const data = new FormData(addForm);
-        await createDomain({
-            name: data.get("name").trim(),
-            url: normalizeUrl(data.get("url").trim()),
-            description: data.get("description").trim(),
-            info: data.get("info").trim()
-        });
-    });
-    const editForm = document.getElementById("editDomainForm");
-    editForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const data = new FormData(editForm);
-        const updated = {
-            ...domain,
-            name: data.get("name").trim(),
-            url: normalizeUrl(data.get("url").trim()),
-            description: data.get("description").trim(),
-            info: data.get("info").trim(),
-            favicon: safeFavicon(normalizeUrl(data.get("url").trim()))
-        };
-        try {
-            await set(ref(db, "domains/" + currentId), updated);
-            statusEl.textContent = "Domain updated.";
-        } catch (error) {
-            statusEl.textContent = "Couldn't save: " + error.message;
-        }
-    });
-    renderSidebar();
-}
-function normalizeUrl(url) {
-    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-    return url;
-}
-async function createDomain(data) {
+async function openDomain(id) {
+    id=Number(id); if(!Number.isFinite(id)||id<1)return;
+    currentId=id; pageEl.innerHTML=`<p>Loading Domain #${id}...</p>`;
     try {
-        const counterRef = ref(db, "meta/nextId");
-        const counterSnap = await get(counterRef);
-        let nextId = counterSnap.exists() ? Number(counterSnap.val()) : 2;
-        if (!Number.isFinite(nextId) || nextId < 2) nextId = 2;
-        // Avoid collisions if the counter is stale.
-        while (domains[String(nextId)]) nextId++;
-        const newDomain = {
-            id: nextId,
-            name: data.name,
-            url: data.url,
-            favicon: safeFavicon(data.url),
-            description: data.description || "",
-            info: data.info || "",
-            links: [],
-            createdAt: Date.now()
-        };
-        await set(ref(db, "domains/" + nextId), newDomain);
-        await update(ref(db, "domains/" + currentId), {
-            links: Array.from(new Set([...(getDomain(currentId)?.links || []), nextId]))
-        });
-        await set(counterRef, nextId + 1);
-        statusEl.textContent = `Created Domain #${nextId} and linked it from #${currentId}.`;
-        openDomain(nextId);
-    } catch (error) {
-        statusEl.textContent = "Couldn't create domain: " + error.message;
-    }
+        const snap=await get(ref(db,"domains/"+id));
+        if(!snap.exists()){renderPage(null);return;}
+        const domain=snap.val();
+        // Refresh index metadata for this domain from the actual domain record.
+        index[String(id)]=makeIndexEntry(domain); updateCache(); renderPage(domain);
+    } catch(e){pageEl.innerHTML=`<div class="panel">Could not load domain: ${escapeHtml(e.message)}</div>`;}
+    window.scrollTo({top:0,behavior:"smooth"});
 }
-function openDomain(id) {
-    currentId = Number(id);
-    renderPage();
-    window.scrollTo({top: 0, behavior: "smooth"});
-}
-window.openDomain = openDomain;
+window.openDomain=openDomain;
+document.getElementById("homeButton").addEventListener("click",()=>openDomain(1));
+searchEl.addEventListener("input",()=>renderSearch(searchEl.value));
 
-document.getElementById("homeButton").addEventListener("click", () => openDomain(1));
-searchEl.addEventListener("input", () => {
-    const query = searchEl.value.toLowerCase().trim();
-    if (!query) {
-        renderSidebar();
-        return;
+async function loadIndex() {
+
+    const cached=readCache();
+    if(cached){index=cached;renderSearch(searchEl.value);return;}
+    const idxSnap=await get(ref(db,"domainIndex"));
+    if(idxSnap.exists()) {
+        index=idxSnap.val()||{}; updateCache(); renderSearch(searchEl.value); return;
     }
-    const found = Object.entries(domains).filter(([id, d]) =>
-        String(id).includes(query) || (d.name || "").toLowerCase().includes(query) || (d.url || "").toLowerCase().includes(query)
-    ).slice(0, 30);
-    sidebarCurrent.innerHTML = `<div class="sidebar-title">Search results</div>` + found.map(([id, d]) =>
-        `<div class="side-link" onclick="window.openDomain(${Number(id)})">#${id} - ${escapeHtml(d.name || d.url || "Unnamed")}</div>`
-    ).join("");
-    sidebarLinks.innerHTML = "";
-});
 
+    statusEl.textContent="Building lightweight index (one-time setup)...";
+    const fullSnap=await get(ref(db,"domains"));
+    const full=fullSnap.val()||{}; const rebuilt={};
+    for(const [id,d] of Object.entries(full)) if(d) rebuilt[id]=makeIndexEntry({...d,id:Number(d.id||id)});
+    await set(ref(db,"domainIndex"),rebuilt);
+    index=rebuilt; updateCache(); renderSearch(searchEl.value);
+    statusEl.textContent=" ";
+}
+async function saveIndexEntry(id,domain) {
+    const entry=makeIndexEntry({...domain,id:Number(id)});
+    await set(ref(db,"domainIndex/"+id),entry);
+    index[String(id)]=entry; updateCache(); renderSearch(searchEl.value);
+}
 try {
     await signInAnonymously(auth);
-    onValue(ref(db, "domains"), snapshot => {
-        domains = snapshot.val() || {};
-        renderPage();
-    }, error => {
-        statusEl.textContent = "Database read error: " + error.message;
-    });
-} catch (error) {
-    statusEl.textContent = "Firebase sign-in error: " + error.message + ". Enable Anonymous sign-in in Firebase Authentication.";
+    await loadIndex();
+    await openDomain(1);
+} catch(error) {
+    statusEl.textContent="Firebase error: "+error.message+". Check Firebase Authentication and database rules.";
 }
 </script>
 </body>
